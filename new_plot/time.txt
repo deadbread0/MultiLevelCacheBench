@@ -1,0 +1,32 @@
+#    cache_size = 5000, requests 0 - 500000:
+2q: total time = 19.6188
+lirs: total time = 27.3668
+arc: total time = 19.9384
+lfu: total time = 741.275
+perfect: total time = 23.0314
+
+#    cache_size = 500, requests 0 - 500000:
+lfu: total time = 44.9962
+lirs: total time = 13.4116
+arc: total time = 10.7484
+2q: total time = 9.90065
+perfect: total time = 20.2767
+
+
+2q + lirs: total time = 36.9195
+lirs + 2q: total time = 37.3968
+arc + 2q: total time = 38.3425
+2q + arc: total time = 38.0977
+2q + lfu: total time = 130.992
+lfu + 2q: total time = 65.9442
+2q + 2q: total time = 33.318
+
+arc + lirs: total time = 52.3491
+lirs + arc: total time = 50.5078
+lfu + arc: total time = 64.3777
+arc + lfu: total time = 118.114
+lirs + lfu: total time = 111.156
+lfu + lirs: total time = 65.6596
+arc + arc: total time = 45.5466
+lirs + lirs: total time = 46.7286
+lfu + lfu: total time = 161.633
