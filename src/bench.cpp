@@ -1,39 +1,74 @@
 #include "../include/bench.hpp"
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <time.h>
 
 int main(int argc, char **argv) 
 {
-  FILE* file_rt = fopen("../new_plot/data_r(h).csv", "w");
-  fprintf(file_rt, "r,h\n");
+    std::ofstream file_time("../new_plot/times.txt");
+    if (!file_time.is_open())
+    {
+        std::cerr << "Error: Could not open or create ../new_plot/times.txt\n";
+        return 0;
+    }
 
-  const int MAX_CACHE_SIZE = 20000;
-  const int MAX_REQUESTS = 500000;
-  int cache_size = 500, total_requests = 0;
-  double total_time = 0;
+    for (int j = 0; j < amount_of_benchfiles; j++)
+    {  
+        std::ofstream file_rt((ALL_FILE_NAMES + j)->file_name);
+        if (!file_rt.is_open())
+        {
+            std::cerr << "Error: file " << (ALL_FILE_NAMES + j)->file_name << " not found or cannot be created\n";
+            return 0; 
+        }
+        
+        file_rt << "r,h\n";
 
-  for (int i = 0; i < MAX_REQUESTS; i += 5000)
-  {
-    clock_t start = 0, fin = 0;
+        const int MAX_REQUESTS = 500000;
+        int amount_of_levels = (ALL_FILE_NAMES + j)->amount_of_levels;
+        int cache_size = 0;
+        for (int y = 0; y < amount_of_levels; y++)
+            cache_size += ((ALL_FILE_NAMES + j)->config[y]).size;
+        double total_time = 0;
 
-    std::vector<long long> prms_vec = generate_zipf_vector(cache_size, i);
-    start = clock();
-    long long hits = ZipfTest(cache_size, i, prms_vec);
+        for (int i = 0; i < MAX_REQUESTS; i += 5000)
+        {
+            struct timespec start_time, fin_time;
 
-    fin = clock();
-    total_time += (double)(fin - start) / CLOCKS_PER_SEC;
+            std::vector<long long> prms_vec = generate_zipf_vector(cache_size, i);
 
-    printf("cache size = %d, total_requests = %d, hits = %lld\n", cache_size, i, hits);
-    fprintf(file_rt, "%d,%lld\n", i, hits);
-  }
+            clock_gettime(CLOCK_THREAD_CPUTIME_ID, &start_time);
 
-  printf("total time = %lg\n", total_time);
-  fclose(file_rt);
+            long long hits = ZipfTest((ALL_FILE_NAMES + j)->config, i, prms_vec);
+
+            clock_gettime(CLOCK_THREAD_CPUTIME_ID, &fin_time);
+            double elapsed = (fin_time.tv_sec - start_time.tv_sec) + 
+                             (fin_time.tv_nsec - start_time.tv_nsec) / 1000000000.0;
+
+            total_time += elapsed;
+
+            std::cout << "cache size = " << cache_size << ", total_requests = " << i << ", hits = " << hits << "\n";
+            file_rt << i << "," << hits << "\n";
+        }
+
+        std::cout << "total time = " << total_time << "\n";
+        file_time << (ALL_FILE_NAMES + j)->file_name << ": total time = " << total_time << "\n";
+    }
+    
+    return 0;
 }
 
 
-long long ZipfTest(int cache_size, int total_requests, std::vector<long long> prms_vec) 
+
+
+long long ZipfTest(levels_t* config, int total_requests, const std::vector<long long>& prms_vec) 
 {    
-    levels_t* config = GetConfig(cache_size);
-    
+    if (config[0].level_num == PERFECT_E) 
+    {
+        int cache_size = config[0].size;
+        return OptZipfTest(cache_size, total_requests, prms_vec);
+    }
+
     long long hits = 0;
     int error = RunLevelCache(config, prms_vec.data(), &hits);
     if (error < 0)
@@ -86,7 +121,7 @@ std::vector<long long> generate_zipf_vector(int cache_size, int total_requests, 
 }
 
 
-long long OptZipfTest(int cache_size, int total_requests, std::vector<long long> prms_vec) 
+long long OptZipfTest(int cache_size, int total_requests, const std::vector<long long>& prms_vec) 
 {    
     if (prms_vec.size() < 2) return -1;
 

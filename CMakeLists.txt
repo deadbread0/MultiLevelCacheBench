@@ -29,6 +29,7 @@ function(add_cache_test TARGET_NAME CACHE_DEFINE)
         GTest::gtest
         GTest::gmock
         Threads::Threads
+        "-fsanitize=undefined,address" "-g" "-fno-omit-frame-pointer"
     )
 
     set_target_properties(${TARGET_NAME} PROPERTIES
@@ -55,6 +56,7 @@ target_include_directories(bench_heats PRIVATE
 
 target_link_libraries(bench_heats PRIVATE
     Threads::Threads
+    "-fsanitize=undefined,address" "-g" "-fno-omit-frame-pointer"
 )
 
 set_target_properties(bench_heats PROPERTIES

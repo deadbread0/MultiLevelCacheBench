@@ -58,13 +58,17 @@ template <typename T, typename KeyT = int> struct cache_lfu_t
     if (hit != hash_.end()) 
     {
       auto eltit = hit->second;
-      eltit->counter++;
 
       auto insert_pos = cache_.begin();
       while (insert_pos != eltit && insert_pos->counter > eltit->counter) 
         ++insert_pos;
 
-      cache_.splice(insert_pos, cache_, eltit);
+      eltit->counter++;
+
+      if (insert_pos != eltit) 
+      {
+        cache_.splice(insert_pos, cache_, eltit);
+      }
 
       return {true, std::nullopt};
     }

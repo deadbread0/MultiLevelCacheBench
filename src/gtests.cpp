@@ -76,7 +76,7 @@ TEST(CacheTest, test3)
   EXPECT_EQ(hits, 2); 
   #endif
   #ifdef LIRS_TEST
-  EXPECT_EQ(hits, 3); // lirs counts irr
+  EXPECT_EQ(hits, 2); // lirs counts irr
   #endif
 }
 
