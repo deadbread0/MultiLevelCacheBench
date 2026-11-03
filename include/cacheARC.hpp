@@ -136,7 +136,6 @@ struct cache_arc_t
 
       if (node.status == Status::B1) 
       {
-        //если значение страницы не передается, то крч это попросту промах, но разве нам не надо передвинуть??
         if (!page_opt.has_value()) {
           return {false, std::nullopt};
         }

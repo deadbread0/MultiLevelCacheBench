@@ -53,40 +53,40 @@ struct bench_t {
 };
 
 const bench_t ALL_FILE_NAMES[] = {
-    // {"../new_plot/data_r(h)_2q500.csv", config_2q, 1},   
+    {"../new_plot/data_r(h)_2q500.csv", config_2q, 1},   
     {"../new_plot/data_r(h)_lfu500.csv", config_lfu, 1},
-    // {"../new_plot/data_r(h)_lirs500.csv", config_lirs, 1},
-    // {"../new_plot/data_r(h)_arc500.csv", config_arc, 1},
-    // {"../new_plot/data_r(h)_perfect500.csv", config_perfect, 1},
+    {"../new_plot/data_r(h)_lirs500.csv", config_lirs, 1},
+    {"../new_plot/data_r(h)_arc500.csv", config_arc, 1},
+    {"../new_plot/data_r(h)_perfect500.csv", config_perfect, 1},
 
-    // {"../new_plot/data_r(h)_2q5000.csv", config_2q5000, 1},   
-    // {"../new_plot/data_r(h)_lfu5000.csv", config_lfu5000, 1},
-    // {"../new_plot/data_r(h)_lirs5000.csv", config_lirs5000, 1},
-    // {"../new_plot/data_r(h)_arc5000.csv", config_arc5000, 1},
-    // {"../new_plot/data_r(h)_perfect5000.csv", config_perfect5000, 1},
+    {"../new_plot/data_r(h)_2q5000.csv", config_2q5000, 1},   
+    {"../new_plot/data_r(h)_lfu5000.csv", config_lfu5000, 1},
+    {"../new_plot/data_r(h)_lirs5000.csv", config_lirs5000, 1},
+    {"../new_plot/data_r(h)_arc5000.csv", config_arc5000, 1},
+    {"../new_plot/data_r(h)_perfect5000.csv", config_perfect5000, 1},
 
-    // {"../new_plot/data_r(h)_2q_2q500.csv", config_2q_2q, 2},   
-    // {"../new_plot/data_r(h)_lfu_lfu500.csv", config_lfu_lfu, 2},
-    // {"../new_plot/data_r(h)_lirs_lirs500.csv", config_lirs_lirs, 2},
-    // {"../new_plot/data_r(h)_arc_arc500.csv", config_arc_arc, 2},
+    {"../new_plot/data_r(h)_2q_2q500.csv", config_2q_2q, 2},   
+    {"../new_plot/data_r(h)_lfu_lfu500.csv", config_lfu_lfu, 2},
+    {"../new_plot/data_r(h)_lirs_lirs500.csv", config_lirs_lirs, 2},
+    {"../new_plot/data_r(h)_arc_arc500.csv", config_arc_arc, 2},
 
-    // {"../new_plot/data_r(h)_2q_lfu500.csv", config_2q_lfu, 2},   
-    // {"../new_plot/data_r(h)_lfu_2q500.csv", config_lfu_2q, 2},
+    {"../new_plot/data_r(h)_2q_lfu500.csv", config_2q_lfu, 2},   
+    {"../new_plot/data_r(h)_lfu_2q500.csv", config_lfu_2q, 2},
 
-    // {"../new_plot/data_r(h)_2q_arc500.csv", config_2q_arc, 2},   
-    // {"../new_plot/data_r(h)_arc_2q500.csv", config_arc_2q, 2},
+    {"../new_plot/data_r(h)_2q_arc500.csv", config_2q_arc, 2},   
+    {"../new_plot/data_r(h)_arc_2q500.csv", config_arc_2q, 2},
 
-    // {"../new_plot/data_r(h)_2q_lirs500.csv", config_2q_lirs, 2},   
-    // {"../new_plot/data_r(h)_lirs_2q500.csv", config_lirs_2q, 2},
+    {"../new_plot/data_r(h)_2q_lirs500.csv", config_2q_lirs, 2},   
+    {"../new_plot/data_r(h)_lirs_2q500.csv", config_lirs_2q, 2},
 
-    // {"../new_plot/data_r(h)_arc_lfu500.csv", config_arc_lfu, 2},   
-    // {"../new_plot/data_r(h)_lfu_arc500.csv", config_lfu_arc, 2},
+    {"../new_plot/data_r(h)_arc_lfu500.csv", config_arc_lfu, 2},   
+    {"../new_plot/data_r(h)_lfu_arc500.csv", config_lfu_arc, 2},
 
-    // {"../new_plot/data_r(h)_arc_lirs500.csv", config_arc_lirs, 2},   
-    // {"../new_plot/data_r(h)_lirs_arc500.csv", config_lirs_arc, 2},
+    {"../new_plot/data_r(h)_arc_lirs500.csv", config_arc_lirs, 2},   
+    {"../new_plot/data_r(h)_lirs_arc500.csv", config_lirs_arc, 2},
 
-    // {"../new_plot/data_r(h)_lirs_lfu500.csv", config_lirs_lfu, 2},   
-    // {"../new_plot/data_r(h)_lfu_lirs500.csv", config_lfu_lirs, 2}
+    {"../new_plot/data_r(h)_lirs_lfu500.csv", config_lirs_lfu, 2},   
+    {"../new_plot/data_r(h)_lfu_lirs500.csv", config_lfu_lirs, 2}
 };
 
 const int amount_of_benchfiles = sizeof(ALL_FILE_NAMES) / sizeof(ALL_FILE_NAMES[0]);
