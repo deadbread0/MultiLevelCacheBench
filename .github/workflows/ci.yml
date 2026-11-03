@@ -1,0 +1,40 @@
+name: CI for project
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Install build tools, GTest and GMock
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libgtest-dev google-mock
+        
+        # Компилируем GTest и GMock, которые apt просто положил в /usr/src
+        cd /usr/src/googletest
+        sudo cmake -B build
+        sudo cmake --build build --target install
+      
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Debug
+
+    - name: Build project
+      run: cmake --build ${{github.workspace}}/build 
+
+    - name: Run Tests
+      run: cd ${{github.workspace}}/build && ctest --output-on-failure
+
+    - name: Run Benchmarks with UB checks
+      working-directory: ${{ github.workspace }}/build
+      run: |
+        mkdir -p ../new_plot
+        ./benchmarks/bench_heats
