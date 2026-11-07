@@ -38,3 +38,9 @@ jobs:
       run: |
         mkdir -p ../new_plot
         ./benchmarks/bench_heats
+
+    - name: Run Stdin
+      run: |
+        cd ${{github.workspace}}/build 
+        ls
+        printf "0 1 1\n" | ./stdin/stdin
