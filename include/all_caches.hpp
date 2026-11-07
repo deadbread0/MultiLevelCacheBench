@@ -29,7 +29,7 @@
 #define cache_t cache_2q_t
 #endif
 
-const int MAX_SIZE_OF_WORD = 4;
+const int MAX_SIZE_OF_WORD = 5;
 
 enum LEVELS {LFU_E, LIRS_E, ARC_E, TWOQ_E, PERFECT_E};
 
@@ -56,12 +56,12 @@ using Page = long long;
 
 Page slow_get_page(PageId key);
 bool read_integer(long long &value);
-long long *GetNums();
+std::vector<long long> GetNums();
 int RunFunc(long long *prms, long long *hits);
 char* GetWordFromBuf(char* buf);
 int GetSizeOfInputFile(const char* file_name);
-char* PutDataFromFileToBuffer(const char* input_file);
-levels_t* GetConfig(int cache_size);
+std::vector<char> PutDataFromFileToBuffer(const char* input_file);
+std::vector<levels_t> GetConfig(int cache_size);
 int CountAmountOfDigits(int num);
 
 struct Node { 

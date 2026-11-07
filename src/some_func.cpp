@@ -14,7 +14,7 @@ bool read_integer(long long &value)
           std::isspace(static_cast<unsigned char>(next)));
 }
 
-long long *GetNums()
+std::vector<long long> GetNums()
 {
     long long m, n;
 
@@ -22,11 +22,11 @@ long long *GetNums()
         static_cast<unsigned long long>(m) > std::numeric_limits<std::size_t>::max())
     { 
         std::cerr << "Expected nonnegative cache size and request count\n";
-        return nullptr;
+        return {};
     }
 
-    long long *prms = (long long*)calloc(n + 2, sizeof(long long));
-    if (!prms) return nullptr;
+    std::vector<long long> prms(n + 2);
+    if (prms.empty()) return {};
     
     prms[0] = m;
     prms[1] = n;
@@ -36,8 +36,7 @@ long long *GetNums()
         if (!read_integer(prms[i + 2]))
         {
             std::cerr << "Not enough numbers entered\n";
-            free(prms);
-            return nullptr;
+            return {};
         }
     }
 
@@ -96,25 +95,26 @@ int RunFunc(long long *prms, long long *hits) {
 #endif
 
 
-levels_t* GetConfig(int cache_size)
+std::vector<levels_t> GetConfig(int cache_size)
 {
-    char* buf = PutDataFromFileToBuffer("../src/config.txt");
+    std::vector<char> buf = PutDataFromFileToBuffer("../src/config.txt");
 
-    int amount_of_levels = atoi(buf);
-    buf += CountAmountOfDigits(amount_of_levels);
+    int amount_of_levels = atoi(buf.data());
+    int amount_of_digits = CountAmountOfDigits(amount_of_levels);
 
-    levels_t* all_levels = (levels_t*)calloc(amount_of_levels, sizeof(levels_t));
+    std::vector<levels_t> all_levels(amount_of_levels);
 
     for (int i = 0; i < amount_of_levels; i++)
     {
-        char* word = GetWordFromBuf(buf);
-        buf += (strlen(word) + 1);
+        char* word = GetWordFromBuf(buf.data() + amount_of_digits);
+        amount_of_digits += (strlen(word) + 1);
 
         for (int c = 0; c < amount_of_levels_cmp; c++)
         {
             if (strncmp(word, levels_arr[c].name, MAX_SIZE_OF_WORD) == 0)
                 all_levels[i].level_num = levels_arr[c].level_enum;
         }
+        delete [] word;
     }
 
     for (int i = 0; i < cache_size; i++)
@@ -127,25 +127,36 @@ levels_t* GetConfig(int cache_size)
     return all_levels;
 }
 
-char* PutDataFromFileToBuffer(const char* input_file)
+std::vector<char> PutDataFromFileToBuffer(const char* input_file)
 {
     int size = GetSizeOfInputFile(input_file);
 
-    char* buffer = (char*)calloc(size + 1, sizeof(char));
+    std::vector<char> buffer(size + 1);
 
-    if (!buffer)
+    if (buffer.empty())
     {
-        printf("memory allocation error, try again\n");
-        return nullptr;
+        std::cout<<"memory allocation error, try again"<<std::endl;
+        return {};
     }
 
     FILE* filee = fopen(input_file, "r");
-    fread(buffer, sizeof(char), size + 1, filee);
 
-    if (!buffer)
+    if (!filee)
     {
-        printf("problems with reading file, try again\n");
-        return nullptr;
+        std::cout<<"can't open file "<<input_file<<std::endl;
+        return {};
+    }
+
+    if (fread(buffer.data(), sizeof(char), size + 1, filee) <= 0)
+    {
+        std::cout<<"can't read file "<<input_file<<std::endl;
+        return {};
+    } 
+
+    if (buffer.empty())
+    {
+        std::cout<<"problems with reading file, try again\n";
+        return {};
     }
 
     fclose(filee);
@@ -164,7 +175,7 @@ int GetSizeOfInputFile(const char* file_name)
 char* GetWordFromBuf(char* buf)
 {
     int i = 0, j = 0;
-    char* word = (char*)calloc(MAX_SIZE_OF_WORD, sizeof(char));
+    char* word = new char [MAX_SIZE_OF_WORD]{};
 
     while (buf[i] == ' ')
         i++;
@@ -174,6 +185,7 @@ char* GetWordFromBuf(char* buf)
         word[j] = buf[i];
         i++; j++;
     }
+    word[j] = '\0';
 
     return word;
 }

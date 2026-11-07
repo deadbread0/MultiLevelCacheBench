@@ -62,3 +62,22 @@ target_link_libraries(bench_heats PRIVATE
 set_target_properties(bench_heats PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/benchmarks"
 )
+
+add_executable(stdin
+    src/all_caches.cpp
+    src/some_func.cpp
+)
+
+target_include_directories(stdin PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+
+target_link_libraries(stdin PRIVATE
+    Threads::Threads
+    "-fsanitize=undefined,address" "-g" "-fno-omit-frame-pointer"
+)
+
+set_target_properties(stdin PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/stdin"
+)

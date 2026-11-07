@@ -44,7 +44,7 @@ template <typename T, typename KeyT = int> struct cache_2q_t
 
   explicit cache_2q_t(std::size_t sz) : sz_(sz) 
   {
-    //25% IN, 50% OUT => 25% main
+    //25% IN, 50% OUT 
     max_in_ = sz_ / 4;
     if (max_in_ == 0 && sz_ > 0) max_in_ = 1;
     
@@ -56,18 +56,25 @@ template <typename T, typename KeyT = int> struct cache_2q_t
 
   std::optional<cache_node_t> free_one_resident_page()
   {
+    if (current_resident_size_ == 0)
+            return std::nullopt;
+
     std::optional<cache_node_t> evicted_node = std::nullopt;
 
-    if (queue_in_.size() > max_in_ && !queue_in_.empty())
+    if ((queue_in_.size() >= max_in_ || queue_main_.empty()) && !queue_in_.empty())
     {
       KeyT key_to_move = queue_in_.back(); //in->out
       queue_in_.pop_back();
       
-      auto &node = hash_[key_to_move];
-      node.status = Status::OUT;
+      auto it = hash_.find(key_to_move);
+      if (it == hash_.end())
+        std::cout<<"error 2q in not in hash\n";
+
+      auto& node = it->second;
       
       evicted_node = cache_node_t{key_to_move, std::move(node.page)};
       node.page = T{}; 
+      node.status = Status::OUT;
 
       if (queue_out_.size() >= max_out_)
       {
@@ -78,17 +85,21 @@ template <typename T, typename KeyT = int> struct cache_2q_t
 
       queue_out_.push_front(key_to_move);
       node.queue_it = queue_out_.begin();
+
+      current_resident_size_--;
     }
 
     // if IN isn't full - delete from the end of main
     else if (!queue_main_.empty()) 
     {
       KeyT key_for_delete = queue_main_.back();
-      queue_main_.pop_back();
       
       auto it = hash_.find(key_for_delete);
       evicted_node = cache_node_t{it->first, std::move(it->second.page)};
+
+      queue_main_.pop_back();
       hash_.erase(it);
+      current_resident_size_--;
     }
     return evicted_node;
   }
@@ -145,7 +156,6 @@ template <typename T, typename KeyT = int> struct cache_2q_t
           return {false, std::nullopt};
         }
 
-        node.page = std::move(*page_opt);
         queue_out_.erase(node.queue_it);
         std::optional<cache_node_t> evicted_node = std::nullopt;
 
@@ -153,18 +163,28 @@ template <typename T, typename KeyT = int> struct cache_2q_t
         {
           evicted_node = free_one_resident_page();
         }
-        else
+
+        //if eviction is not possible, we restore OUT. 
+        if (current_resident_size_ >= sz_)
         {
-          current_resident_size_++;
+          queue_out_.push_front(key);
+          node.status = Status::OUT;
+          node.queue_it = queue_out_.begin();
+
+          return {false, std::nullopt};
         }
 
+        node.page = std::move(*page_opt);
         node.status = Status::MAIN;
         queue_main_.push_front(key);
         node.queue_it = queue_main_.begin();
+        current_resident_size_++;
+
         return {false, evicted_node};
       }
     }
 
+    // element isn't in ht
     if (!page_opt.has_value()) {
       return {false, std::nullopt};
     }
@@ -173,21 +193,16 @@ template <typename T, typename KeyT = int> struct cache_2q_t
     node_t new_node{key, page, Status::IN, {}};
     std::optional<cache_node_t> evicted_node = std::nullopt;
 
-    if (current_resident_size_ < sz_)
-    {
-      queue_in_.push_front(key);
-      new_node.queue_it = queue_in_.begin();
-      hash_[key] = std::move(new_node);
-      current_resident_size_++;
-    }
-    else
+    if (current_resident_size_ >= sz_)
     {
       evicted_node = free_one_resident_page();
-
-      queue_in_.push_front(key);
-      new_node.queue_it = queue_in_.begin();
-      hash_[key] = std::move(new_node);
     }
+
+    queue_in_.push_front(key);
+    new_node.queue_it = queue_in_.begin();
+
+    hash_[key] = std::move(new_node);
+    current_resident_size_++;
 
     return {false, evicted_node};
   }

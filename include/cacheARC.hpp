@@ -63,7 +63,12 @@ struct cache_arc_t
       KeyT key_to_move = t1_.back();
       t1_.pop_back();
 
-      auto &node = hash_[key_to_move];
+      auto it = hash_.find(key_to_move);
+
+      if (it == hash_.end())
+          return std::nullopt;
+
+      auto& node = it->second;
       node.status = Status::B1;
       
       evicted_node = cache_node_t{key_to_move, std::move(node.page)};
@@ -199,10 +204,18 @@ struct cache_arc_t
       // T1 is full
       else 
       {
-        auto it = hash_.find(t1_.back());
-        evicted_node = cache_node_t{it->first, std::move(it->second.page)};
-        hash_.erase(it);
+        KeyT key_to_move = t1_.back();
         t1_.pop_back();
+
+        auto it = hash_.find(key_to_move);
+        auto& node = it->second;
+        node.status = Status::B1;
+        
+        evicted_node = cache_node_t{key_to_move, std::move(node.page)};
+        node.page = T{}; // kill page data
+
+        b1_.push_front(key_to_move);
+        node.list_it = b1_.begin();
       }
     } 
     else if (t1_.size() + b1_.size() < sz_) 
